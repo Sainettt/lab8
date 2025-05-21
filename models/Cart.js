@@ -34,20 +34,19 @@ class Cart {
       }
 
       const cart = await this.getCart()
+      const items = cart.items
 
-      const searchedProduct = cart.items.find(
-        (item) => item.product.name === product.name
-      )
+      const searchedProduct = items.find(item => item.product.name === product.name)
 
       if (searchedProduct) {
         searchedProduct.quantity += 1
       } else {
-        cart.items.push({ product, quantity: 1 })
+        items.push({ product, quantity: 1 })
       }
 
       await db
         .collection(COLLECTION_NAME)
-        .updateOne({}, { $set: { items: cart.items } })
+        .updateOne({}, { $set: { items } } )
 
       return true
     } catch (error) {

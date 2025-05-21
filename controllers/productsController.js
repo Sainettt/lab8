@@ -6,8 +6,9 @@ const { STATUS_CODE } = require("../constants/statusCode");
 const cartController = require("./cartController");
 
 exports.getProductsView = async (request, response) => {
-  const cartCount = cartController.getProductsCount();
+  const cartCount = await cartController.getProductsCount();
   const products = await Product.getAll();
+  console.log(products);
 
   response.render("products.ejs", {
     headTitle: "Shop - Products",
@@ -67,11 +68,10 @@ exports.deleteProduct = async (request, response) => {
 
   response.status(STATUS_CODE.OK).json({ success: true });
 };
-
 exports.addProduct = async (request, response) => {
   const { name, description, price } = request.body;
 
   await Product.add({ name, description, price });
 
-  response.redirect(STATUS_CODE.FOUND, "/products/new"); // 302 Found
+  response.redirect(STATUS_CODE.FOUND, "/products/new");
 };
