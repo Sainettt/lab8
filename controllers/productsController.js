@@ -67,3 +67,11 @@ exports.deleteProduct = async (request, response) => {
 
   response.status(STATUS_CODE.OK).json({ success: true });
 };
+
+exports.addProduct = async (request, response) => {
+  const { name, description, price } = request.body;
+
+  await Product.add({ name, description, price });
+
+  response.redirect(STATUS_CODE.FOUND, "/products/new"); // 302 Found
+};
