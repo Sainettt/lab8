@@ -1,66 +1,67 @@
-const { getDatabase } = require("../database");
-
-const COLLECTION_NAME = "products";
+const { getDatabase } = require('../database')
+const Cart = require('./Cart')
+const COLLECTION_NAME = 'products'
 
 class Product {
   constructor(name, description, price) {
-    this.name = name;
-    this.description = description;
-    this.price = price;
+    this.name = name
+    this.description = description
+    this.price = price
   }
 
   static async getAll() {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
-      const products = await db.collection(COLLECTION_NAME).find({}).toArray();
+      const products = await db.collection(COLLECTION_NAME).find({}).toArray()
 
-      return products;
+      return products
     } catch (error) {
-      console.error("Error occurred while searching for all products");
+      console.error('Error occurred while searching for all products')
 
-      return [];
+      return []
     }
   }
 
   static async add(product) {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
-      await db.collection(COLLECTION_NAME).insertOne(product);
+      await db.collection(COLLECTION_NAME).insertOne(product)
     } catch (error) {
-      console.error("Error occurred while adding product");
+      console.error('Error occurred while adding product')
     }
   }
 
   static async findByName(name) {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
       const searchedProduct = await db
         .collection(COLLECTION_NAME)
-        .findOne({ name });
+        .findOne({ name })
 
-      return searchedProduct;
+      return searchedProduct
     } catch (error) {
-      console.error("Error occurred while searching product");
+      console.error('Error occurred while searching product')
 
-      return null;
+      return null
     }
   }
 
   static async deleteByName(name) {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
-      await db.collection(COLLECTION_NAME).deleteOne({ name });
+      await db.collection(COLLECTION_NAME).deleteOne({ name })
+      await Cart.deleteProductByName(name)
     } catch (error) {
-      console.error("Error occurred while deleting product");
+      console.error('Error occurred while deleting product')
     }
   }
 
   static async getLast() {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
       const lastAddedProduct = await db
@@ -69,15 +70,15 @@ class Product {
         .sort({ _id: -1 })
         .limit(1)
         .toArray()
-        .then((docs) => docs[0]);
+        .then((docs) => docs[0])
 
-      return lastAddedProduct;
+      return lastAddedProduct
     } catch (error) {
-      console.error("Error occurred while searching for last product");
+      console.error('Error occurred while searching for last product')
 
-      return null;
+      return null
     }
   }
 }
 
-module.exports = Product;
+module.exports = Product

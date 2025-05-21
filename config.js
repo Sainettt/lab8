@@ -1,5 +1,5 @@
 const PORT = 3000;
-const DB_USER = "";
-const DB_PASS = "";
+const DB_USER = "danyilfiut";
+const DB_PASS = "danyilfiut";
 
 module.exports = { PORT, DB_USER, DB_PASS };

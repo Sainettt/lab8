@@ -1,118 +1,135 @@
-const Product = require("./Product");
-const { getDatabase } = require("../database");
+const Product = require('./Product')
+const { getDatabase } = require('../database')
 
-const COLLECTION_NAME = "carts";
+const COLLECTION_NAME = 'carts'
 
 class Cart {
   constructor() {}
 
   static async getCart() {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
-      const cart = await db.collection(COLLECTION_NAME).findOne({});
+      const cart = await db.collection(COLLECTION_NAME).findOne({})
 
       if (!cart) {
-        await db.collection(COLLECTION_NAME).insertOne({ items: [] });
-        return { items: [] };
+        await db.collection(COLLECTION_NAME).insertOne({ items: [] })
+        return { items: [] }
       }
 
-      return cart;
+      return cart
     } catch (error) {
-      console.error("Error occurred while searching cart");
+      console.error('Error occurred while searching cart')
 
-      return { items: [] };
+      return { items: [] }
     }
   }
 
   static async add(productName) {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
-      const product = await Product.findByName(productName);
+      const product = await Product.findByName(productName)
 
       if (!product) {
-        throw Error(`Product '${productName}' not found`);
+        throw Error(`Product '${productName}' not found`)
       }
 
-      const cart = await this.getCart();
+      const cart = await this.getCart()
       const searchedProduct = cart.items.find(
         (item) => item.product.name === productName
-      );
+      )
 
       if (searchedProduct) {
-        searchedProduct.quantity += 1;
+        searchedProduct.quantity += 1
       } else {
-        cart.items.push({ product, quantity: 1 });
+        cart.items.push({ product, quantity: 1 })
       }
 
       await db
         .collection(COLLECTION_NAME)
-        .updateOne({}, { $set: { items: cart.items } });
+        .updateOne({}, { $set: { items: cart.items } })
     } catch (error) {
-      console.error("Error occurred while adding product to cart");
+      console.error('Error occurred while adding product to cart')
     }
   }
 
   static async getItems() {
     try {
-      const cart = await this.getCart();
+      const cart = await this.getCart()
 
-      return cart.items;
+      return cart.items
     } catch (error) {
-      console.error("Error occurred while searching for products in cart");
+      console.error('Error occurred while searching for products in cart')
 
-      return [];
+      return []
     }
   }
 
   static async getProductsQuantity() {
     try {
-      const cart = await this.getCart();
+      const cart = await this.getCart()
       const productsQuantity = cart.items.reduce(
         (total, item) => total + item.quantity,
         0
-      );
+      )
 
-      return productsQuantity;
+      return productsQuantity
     } catch (error) {
-      console.error("Error occurred while getting quantity of items in cart");
+      console.error('Error occurred while getting quantity of items in cart')
 
-      return 0;
+      return 0
     }
   }
 
   static async getTotalPrice() {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
-      const cart = await this.getCart();
+      const cart = await this.getCart()
       const totalPrice = cart.items.reduce(
         (total, item) => total + item.product.price * item.quantity,
         0
-      );
+      )
 
-      return totalPrice;
+      return totalPrice
     } catch (error) {
       console.error(
-        "Error occurred while calcualting total price of items in cart"
-      );
+        'Error occurred while calcualting total price of items in cart'
+      )
 
-      return 0;
+      return 0
+    }
+  }
+
+  static async deleteProductByName(name) {
+    const db = getDatabase()
+
+    try {
+      const cart = await this.getCart()
+      const filteredItems = cart.items.filter(
+        (item) => item.product.name !== name
+      )
+
+      await db
+        .collection(COLLECTION_NAME)
+        .updateOne({}, { $set: { items: filteredItems } })
+    } catch (error) {
+      console.error('Error occurred while deleting product from cart')
     }
   }
 
   static async clearCart() {
-    const db = getDatabase();
+    const db = getDatabase()
 
     try {
       await db
         .collection(COLLECTION_NAME)
-        .updateOne({}, { $set: { items: [] } });
+        .updateOne({}, { $set: { items: [] } })
     } catch (error) {
-      console.error("Error occurred while clearing cart");
+      console.error('Error occurred while clearing cart')
     }
   }
 }
 
-module.exports = Cart;
+module.exports = Cart
