@@ -25,19 +25,18 @@ class Cart {
     }
   }
 
-  static async add(productName) {
+  static async add(product) {
     const db = getDatabase()
 
     try {
-      const product = await Product.findByName(productName)
-
-      if (!product) {
-        throw Error(`Product '${productName}' not found`)
+      if (!product || !product.name || !product.price) {
+        throw new Error('Invalid product object')
       }
 
       const cart = await this.getCart()
+
       const searchedProduct = cart.items.find(
-        (item) => item.product.name === productName
+        (item) => item.product.name === product.name
       )
 
       if (searchedProduct) {
@@ -49,8 +48,14 @@ class Cart {
       await db
         .collection(COLLECTION_NAME)
         .updateOne({}, { $set: { items: cart.items } })
+
+      return true
     } catch (error) {
-      console.error('Error occurred while adding product to cart')
+      console.error(
+        'Error occurred while adding product to cart:',
+        error.message
+      )
+      return false
     }
   }
 

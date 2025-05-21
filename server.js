@@ -12,12 +12,14 @@ const homeRoutes = require("./routing/home");
 const { STATUS_CODE } = require("./constants/statusCode");
 const { MENU_LINKS } = require("./constants/navigation");
 const cartController = require("./controllers/cartController");
-
+const cartRoutes = require("./routing/cart");
 const app = express();
+
 
 app.set("view engine", "ejs");
 app.set("views", "views");
 
+app.use(express.json())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -31,6 +33,7 @@ app.use((request, _response, next) => {
 app.use("/products", productsRoutes);
 app.use("/logout", logoutRoutes);
 app.use("/kill", killRoutes);
+app.use("/cart", cartRoutes);
 app.use(homeRoutes);
 app.use((request, response) => {
   const { url } = request;
